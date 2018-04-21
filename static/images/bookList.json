@@ -1,0 +1,64 @@
+{
+  "bookList": [
+    {
+      "booksName": "家用空调",
+      "catName": "家用空调",
+      "catId": "10",
+      "booksId": "2750"
+    },
+    {
+      "booksName": "中央空调",
+      "catName": "中央空调",
+      "catId": "11",
+      "booksId": "3139"
+    },
+    {
+      "booksName": "冰箱",
+      "catName": "美的冰箱",
+      "catId": "12",
+      "booksId": "3117"
+    },
+    {
+      "booksName": "洗衣机",
+      "catName": "美的洗衣机",
+      "catId": "13",
+      "booksId": "2491"
+    },
+    {
+      "booksName": "厨房电器",
+      "catName": "厨房电器",
+      "catId": "14",
+      "booksId": "3106"
+    },
+    {
+      "booksName": "生活电器",
+      "catName": "生活电器",
+      "catId": "15",
+      "booksId": "3127"
+    },
+    {
+      "booksName": "环境电器",
+      "catName": "环境电器",
+      "catId": "16",
+      "booksId": "3187"
+    },
+    {
+      "booksName": "热水器",
+      "catName": "热水器",
+      "catId": "17",
+      "booksId": "3191"
+    },
+    {
+      "booksName": "洗衣机",
+      "catName": "小天鹅洗衣机",
+      "catId": "23",
+      "booksId": "2491"
+    },
+    {
+      "booksName": "清洁电器",
+      "catName": "null",
+      "catId": "30",
+      "booksId": "3529"
+    }
+  ]
+}
