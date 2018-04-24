@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <my-header :showSearch="showSearch" :roleType="roleType" :isHomePage="isHomePage" :showCat="showCat"
+  <div id="top">
+    <my-header :showSearch="showSearch" :roleType="roleType" :showSecondCat="showSecondCat" :showCat="showCat"
                :showProgressbar="showProgressBar">
       <!--<a href="" slot="goHome">返回首页</a>-->
       <span slot="title" class="msg">首页</span>
@@ -8,7 +8,7 @@
     <!--幻灯片部分-->
     <div class="slider">
       <ul class="slideshow" v-if="sliderList.length">
-        <li :class="{'active': currentIndex === index}" v-for="(item, index) in sliderList" :key="index">
+        <li :class="{'active': currentIndex === index}" v-for="(item, index) in sliderList" :key="index" v-on:mouseenter="goPage(index)" v-on:mouseleave="autoPlay">
           <a href="" target="_blank">
             <img :src="item.url" height="400" alt="">
           </a>
@@ -20,7 +20,7 @@
       </div>
       <ul class="dotnav" v-if="sliderList">
         <li :class="{'active': currentIndex === index}" v-for="(item, index) in sliderList" :key="index"
-            v-on:mouseenter="goPage(index)">
+            v-on:mouseenter="goPage(index)" v-on:mouseleave="autoPlay">
           <a></a>
         </li>
       </ul>
@@ -88,6 +88,7 @@
     <!-- 用户信息 -->
     <div class="content">
       <div class="uk-container uk-container-center">
+        <!--新品start-->
         <div class="new-goods">
           <div class="title">
             <h2>新品推荐</h2>
@@ -97,10 +98,7 @@
           </div>
           <div id="bookList">
             <ul class="grid grid-width-1-8 grid-collapse booklist" v-if="bookList.length">
-              <li
-                :class="{'c-active': currentBookIndex === index, 'active': mCurrentBookIndex === index, 'bigLi': bookList.length > 8, 'smallLi': bookList.length <= 8}"
-                v-for="(item, index) in bookList" :key="index" @click="clickBook(index)"
-                v-on:mouseenter="showBlue(index)">
+              <li :class="{'c-active': currentBookIndex === index, 'active': mCurrentBookIndex === index, 'bigLi': bookList.length > 8, 'smallLi': bookList.length <= 8}" v-for="(item, index) in bookList" :key="index" @click="clickBook(index)" v-on:mouseenter="mCurrentBookIndex = index"v-on:mouseleave="mCurrentBookIndex = null">
                 <img class="show" :src="'/static/images/active'+item.booksId+'.png'" alt="">
                 <img :src="'/static/images/'+item.booksId+'.png'" alt="">
                 <p>{{item.booksName}}</p>
@@ -129,6 +127,8 @@
             </ul>
           </div>
         </div>
+        <!--新品end-->
+        <!--hotSale start-->
         <div class="hot-sale" id="hotList">
           <div class="title">
             <h2>热卖推荐</h2>
@@ -136,64 +136,76 @@
             <p>HOT PRODUCTS </p>
           </div>
           <div id="hotSale">
-            <!--<div class="hot-height">-->
-              <!--<div v-for="(item, i) in hotSaleList" v-if="item.productList.length > 0" :key="i">-->
-                <!--<div class="floor clear" :id="item.booksId">-->
-                  <!--<h2>{{i + 1}}F {{item.booksName}}</h2>-->
-                  <!--<a href="" target="_blank" v-if="item.booksId == 2491">更多  >-->
-                  <!--</a>-->
-                  <!--<a href="" v-else target="_blank">更多 >-->
-                  <!--</a>-->
-                <!--</div>-->
-                <!--<div class="hot-sale-list">-->
-                  <!--<div class="grid grid-small" v-for="(goodsItem, index) in item.productList"  :key="index">-->
-                    <!--<div class="width-3-10" style="width: 372px">-->
-                      <!--<div class="left-product" v-if="index === 0">-->
-                        <!--<a href="" target="_blank">-->
-                          <!--<img :src="goodsItem.itemUrl">-->
-                          <!--<div>-->
-                            <!--<p class="goods-name">{{goodsItem.itemName}}</p>-->
-                            <!--<p class="hot-points">{{goodsItem.slogan}}</p>-->
-                            <!--<p class="price" v-if="goodsItem.purchasePrice">¥  {{goodsItem.purchasePrice}}</p>-->
-                            <!--<p class="price" v-else>暂无定价</p>-->
-                          <!--</div>-->
-                        <!--</a>-->
-                      <!--</div>-->
-                    <!--</div>-->
+            <div class="hot-height">
+              <div v-for="(item, i) in hotSaleList" v-if="item.productList.length > 0" :key="item.booksId">
+                <div class="floor clear" :class="{'first-floor': i === 0}" :id="item.booksName">
+                  <h2>{{i + 1}}F {{item.booksName}}</h2>
+                  <a href="" target="_blank" v-if="item.booksId == 2491">更多  >
+                  </a>
+                  <a href="" v-else target="_blank">更多 >
+                  </a>
+                </div>
+                <div class="hot-sale-list">
+                  <div class="grid grid-small">
+                    <div class="width-3-10" v-for="(goodsItem, index) in item.productList"  :key="index" v-if="index === 0" style="width: 372px">
+                      <div class="left-product">
+                        <a href="" target="_blank">
+                          <img :src="goodsItem.itemUrl">
+                          <div>
+                            <p class="goods-name">{{goodsItem.itemName}}</p>
+                            <p class="hot-points">{{goodsItem.slogan}}</p>
+                            <p class="price" v-if="goodsItem.purchasePrice">¥  {{goodsItem.purchasePrice}}</p>
+                            <p class="price" v-else>暂无定价</p>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
 
-                    <!--<div class="width-7-10" style="width: 838px">-->
-                      <!--<ul class="grid grid-width-1-2 grid-small">-->
-                        <!--<li class="right-goodslist" v-if="index >= 1 && index <= 4">-->
-                          <!--<a href="" target="_blank">-->
-                            <!--<div class="clear">-->
-                              <!--<div class="fl">-->
-                                <!--<img :src="goodsItem.itemUrl">-->
-                              <!--</div>-->
-                              <!--<div class="fr">-->
-                                <!--<p class="goods-name">{{goodsItem.itemName}}</p>-->
-                                <!--<p class="price" v-if="goodsItem.purchasePrice > 0">¥  {{goodsItem.purchasePrice}}</p>-->
-                                <!--<p v-else class="price">暂无定价</p>-->
-                              <!--</div>-->
-                            <!--</div>-->
-                          <!--</a>-->
-                        <!--</li>-->
-                        <!--<li v-for="(li, n) in item.noGoods" :key="n">-->
-                          <!--<div class="waiting">-->
-                            <!--<div class="no-goods"></div>-->
-                            <!--<span>更多商品,敬请期待...</span>-->
-                          <!--</div>-->
-                        <!--</li>-->
-                      <!--</ul>-->
-                    <!--</div>-->
-                  <!--</div>-->
-                <!--</div>-->
-              <!--</div>-->
-            <!--</div>-->
+                    <div class="width-7-10" style="width: 838px">
+                      <ul class="grid grid-width-1-2 grid-small">
+                        <li class="right-goodslist" :class="{'mt-10': index > 2}" v-for="(goodsItem, index) in item.productList"  :key="'a'+index"  v-if="index >= 1 && index <= 4">
+                          <a href="" target="_blank" v-if="goodsItem.itemName">
+                            <div class="clear">
+                              <div class="fl">
+                                <img :src="goodsItem.itemUrl">
+                              </div>
+                              <div class="fr">
+                                <p class="goods-name">{{goodsItem.itemName}}</p>
+                                <p class="price" v-if="goodsItem.purchasePrice > 0">¥  {{goodsItem.purchasePrice}}</p>
+                                <p v-else class="price">暂无定价</p>
+                              </div>
+                            </div>
+                          </a>
+                          <div class="waiting" v-else>
+                            <div class="no-goods"></div>
+                            <span>更多商品,敬请期待...</span>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+        <!--hotSale end-->
+      </div>
+    </div>
+    <div id="fixed">
+      <div class="right-fixed" :class="{'show': showFixed}">
+        <ul class="list">
+          <li v-for="(item, index) in hotSaleList" :class="{'c-active': currentFixIndex === index, 'long': item.booksName.length > 3}" @click="currentFixIndex=index">
+            <a v-scroll-to="'#'+item.booksName">{{item.booksName}}</a>
+          </li>
+        </ul>
+        <div class="go-top">
+          <a v-scroll-to="'#top'">
+            <img src="../assets/images/callTop.png" alt="">
+          </a>
         </div>
       </div>
     </div>
-    <div id="fixed"></div>
     <div id="footer"></div>
   </div>
 </template>
@@ -207,7 +219,7 @@
         showProgressBar: false,
         showCat: true,
         roleType: 1,
-        isHomePage: true,
+        showSecondCat: true,
         newGoodsList: [], // 新品的列表
         expected: [], // 敬请期待的列表
         bookList: [], // 事业部分类列表
@@ -217,7 +229,9 @@
         total: 0, // 总幻灯片的个数
         currentBookIndex: 0, // 当前第几个事业部被点击
         mCurrentBookIndex: 0, // 鼠标移上第几个事业部
-        hotSaleList: []
+        hotSaleList: [], //热卖数据列表
+        currentFixIndex: 0,  //右侧固定定位当前高亮显示的index
+        showFixed: false,   //显示右侧固定定位的列表
       }
     },
     components: {
@@ -259,7 +273,6 @@
           })
       },
       autoPlay () {
-        if (this.automaticPlay) return
         this.automaticPlay = setInterval(() => {
           if (this.currentIndex === this.total - 1) {
             this.currentIndex = 0;
@@ -284,13 +297,11 @@
       },
       goPage (index) {
         this.currentIndex = index;
+        clearInterval(this.automaticPlay);
       },
       clickBook (index) {
         this.currentBookIndex = index;
-        this.getBookList();
-      },
-      showBlue (index) {
-        this.mCurrentBookIndex = index;
+        this.getNewGoods();
       },
       // 获取热卖的数据列表
       getHotSaleList () {
@@ -298,7 +309,14 @@
           .then((data) => {
             let hotSaleList = data;
             this.hotSaleList = this.getHotSaleData(hotSaleList, this.bookList);
-            console.log('this.hotSaleList', this.hotSaleList);
+            this.hotSaleList.forEach(function(item){
+              if(item.productList.length < 5){
+                var l = 5 - item.productList.length;
+                for (var i = 0; i < l; i++) {
+                  item.productList.push(i);
+                }
+              }
+            })
           }, error => {
             console.log(error);
           })
@@ -322,6 +340,19 @@
           }
         }
         return result;
+      },
+      scroll(){
+        window.addEventListener('scroll', () => {
+          const number = window.pageYOffset ||
+            document.documentElement.scrollTop ||
+            document.body.scrollTop || 0;
+          let t = document.getElementById("hotList").offsetTop - 300;
+          if(number > t){
+            this.showFixed = true;
+          }else{
+            this.showFixed = false;
+          }
+        })
       }
     },
     mounted () {
@@ -329,20 +360,12 @@
     },
     updated () {
       // this.autoPlay()
+      this.scroll()
     }
   }
 </script>
 <style scoped lang="scss">
   @import "../assets/style/common";
-
-  $mainColor: #00A7ff;
-  $fontcolor: #333;
-  $greyColor: #666;
-  $notAllowColot: #999;
-  $borderColor: #DDD;
-  $whiteColor: #fff;
-  $bgColor: #f8f8f8;
-  $priceColor: #ff5028;
   .uk-grid-width-1-7 > * {
     width: 14.29%;
   }
@@ -453,34 +476,34 @@
           width: 12px;
           height: 12px;
           border-radius: 50%;
-          background: $whiteColor;
+          background: $white;
         }
       }
     }
   }
 
   .content {
-    background: #f2f2f2;
+    background: $containerBgColor;
     padding-bottom: 40px;
     min-width: 1200px;
     .waiting {
       height: 270px;
       text-align: center;
-      background: $whiteColor;
+      background: $white;
       box-sizing: border-box;
       padding-top: 15px;
       span {
         font-size: 14px;
         display: inline-block;
         line-height: 20px;
-        color: $notAllowColot;
+        color: $color9;
       }
     }
     .no-goods {
       height: 207px;
       width: 192px;
       margin: 30px auto 15px;
-      background-color: $whiteColor;
+      background-color: $white;
       background-image: url("../assets/images/waiting.png");
       background-position: center;
       background-repeat: no-repeat;
@@ -492,7 +515,7 @@
         position: absolute;
         //margin-right: 20px;
         font-size: 12px;
-        color: $notAllowColot;
+        color: $color9;
         bottom: 0;
         right: 0;
         cursor: pointer;
@@ -508,7 +531,7 @@
       h2 {
         font-size: 22px;
         line-height: 22px;
-        color: $fontcolor;
+        color: $color3;
       }
       p {
         font-size: 12px;
@@ -534,7 +557,7 @@
         text-align: center;
         cursor: pointer;
         text-align: center;
-        background: $whiteColor;
+        background: $white;
       }
       .show {
         display: none;
@@ -559,7 +582,7 @@
       .active, .c-active {
         background: $mainColor;
         p {
-          color: $whiteColor;
+          color: $white;
         }
         img {
           display: none;
@@ -577,12 +600,12 @@
       li {
         & > a {
           display: block;
-          background: $whiteColor;
+          background: $white;
           padding: 0 23px;
         }
         .goods-name {
           font-size: 14px;
-          color: $fontcolor;
+          color: $color3;
           letter-spacing: 0;
           line-height: 24px;
           height: 48px;
@@ -590,7 +613,7 @@
         }
         .price {
           font-size: 18px;
-          color: #FF5028;
+          color: $priceColor;
           letter-spacing: 0;
           line-height: 18px;
           margin-top: 12px;
@@ -605,6 +628,9 @@
       }
     }
     .hot-sale-list {
+      .mt-10{
+        margin-top: 10px;
+      }
       .width-3-10 {
         img {
           height: 362px;
@@ -615,16 +641,13 @@
         margin: 0 auto;
       }
       .right-goodslist {
-        //&:nth-child(n+3){
-        //  margin-top: 10px;
-        //}
         img {
           height: 193px;
         }
         a {
           display: block;
           padding: 44px 18px 33px;
-          background: $whiteColor;
+          background: $white;
           .fr {
             width: 128px;
             margin-right: 17px;
@@ -634,13 +657,13 @@
             font-size: 14px;
             line-height: 24px;
             height: 48px;
-            color: $fontcolor;
+            color: $color3;
             overflow: hidden;
             text-overflow: ellipsis;
           }
           .price {
             font-size: 18px;
-            color: #FF5028;
+            color: $priceColor;
             margin-top: 15px;
             line-height: 18px;
           }
@@ -653,7 +676,7 @@
   }
 
   .left-product {
-    background: $whiteColor;
+    background: $white;
     height: 550px;
     a {
       display: block;
@@ -676,7 +699,7 @@
       }
       .hot-points {
         font-size: 14px;
-        color: $notAllowColot;
+        color: $color9;
         letter-spacing: 0;
         line-height: 30px;
         white-space: nowrap;
@@ -685,7 +708,7 @@
       }
       .price {
         font-size: 24px;
-        color: #FF5028;
+        color: $priceColor;
         margin-top: 18px;
         line-height: 20px;
       }
@@ -694,7 +717,7 @@
 
   .floor {
     padding: 40px 0 20px 0;
-    &:first-child {
+    &.first-floor {
       padding: 0;
       position: relative;
       top: -20px;
@@ -704,13 +727,13 @@
       font-family: PingFangSC-Medium;
       font-size: 20px;
       line-height: 20px;
-      color: $fontcolor;
+      color: $color3;
       font-weight: normal;
       float: left;
     }
     a {
       float: right;
-      color: #999;
+      color: $color9;
       font-size: 12px;
     }
   }
@@ -720,8 +743,12 @@
     .right-fixed {
       position: fixed;
       top: 50%;
-      right: -100px;
-      margin-top: -30px;
+      right: 0;
+      -webkit-transform: translateY(-50%);
+      -moz-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+      -o-transform: translateY(-50%);
+      transform: translateY(-50%);
       z-index: 100;
       opacity: 0;
       transition: all .5s ease;
@@ -744,7 +771,7 @@
       list-style: none;
       box-shadow: 0 1px 4px rgba(0, 0, 0, .15);
       li {
-        background: $whiteColor;
+        background: $white;
         text-align: center;
         line-height: 58px;
         transition: all .4s ease;
@@ -754,7 +781,7 @@
         &:hover {
           background: $mainColor;
           a {
-            color: $whiteColor;
+            color: $white;
           }
         }
         & + li {
@@ -763,7 +790,7 @@
         &.c-active {
           background: $mainColor;
           a {
-            color: $whiteColor;
+            color: $white;
           }
         }
         &.long {
@@ -793,7 +820,7 @@
     .userBaseInfo {
       width: 190px;
       height: 360px;
-      background-color: $whiteColor;
+      background-color: $white;
       box-sizing: border-box;
       padding: 20px 15px 23px;
       position: absolute;
@@ -815,7 +842,7 @@
         margin: 0 auto;
         text-align: center;
         font-size: 12px;
-        color: $fontcolor;
+        color: $color3;
         line-height: 18px;
         height: 36px;
         overflow: hidden;
@@ -834,14 +861,14 @@
           p.toCheckCount {
             font-family: PingFangSC-Medium;
             font-size: 20px;
-            color: $fontcolor;
+            color: $color3;
             letter-spacing: 0;
             line-height: 20px;
           }
           p.state {
             font-family: PingFangSC-Regular;
             font-size: 12px;
-            color: $greyColor;
+            color: $color6;
             letter-spacing: 0;
             line-height: 12px;
             margin-top: 10px;
@@ -859,7 +886,7 @@
           h3 {
             font-family: PingFangSC-Medium;
             font-size: 12px;
-            color: $fontcolor;
+            color: $color3;
             letter-spacing: 0;
             line-height: 12px;
             float: left;
@@ -867,7 +894,7 @@
           a {
             font-family: PingFangSC-Light;
             font-size: 12px;
-            color: $notAllowColot;
+            color: $color9;
             letter-spacing: 0;
             line-height: 12px;
             float: right;
@@ -888,7 +915,7 @@
             display: block;
             font-family: PingFangSC-Regular;
             font-size: 12px;
-            color: $greyColor;
+            color: $color6;
             letter-spacing: 0;
             line-height: 24px;
             overflow: hidden;

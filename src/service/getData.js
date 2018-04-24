@@ -50,7 +50,6 @@ export const getHotSaleListService = http => {
   return http.get('/static/mocks/hotGoodsSaleList.json')
     .then((res) => {
       let data = res.body
-      console.log(2323, data)
       if (data.header.resultCode === '0000') {
         return data.content.rcmdList
       } else {
@@ -58,5 +57,19 @@ export const getHotSaleListService = http => {
       }
     }, error => {
       throw new Error(error)
+    })
+}
+export const getSpecialPriceService = (http, params) => {
+  return http.get('http://localhost:3006/specialPrice/specialPrice', {params: {'catId': params.catId},})
+    .then((res) => {
+      let data = res.body;
+      console.log(2323, data);
+      if (data.code === 1) {
+        return data.data;
+      } else {
+        throw new Error(res);
+      }
+    }, error => {
+      throw new Error(error);
     })
 }

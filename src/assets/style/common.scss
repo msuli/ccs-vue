@@ -1,17 +1,4 @@
-$mainColor: #00A7FF;
-$white: #fff;
-$font14: 14px;
-$font16: 16px;
-$font12: 12px;
-$containerBgColor: #f2f2f2;
-$priceColor: #FF5028;
-$color3: #333333;
-$color6: #666;
-$color9: #999;
-$originPriceColor: #3F3F3F;
-$grid-gutter-horizontal: 25px;
-$grid-gutter-vertical: 25px;
-$borderColor: #d5d5d5;
+@import './variable.scss';
 $grid-gutter-small-horizontal: 10px;
 $grid-gutter-small-vertical: 10px;
 //@font-face {
@@ -29,42 +16,6 @@ $grid-gutter-small-vertical: 10px;
 //  -webkit-text-stroke-width: 0.2px;
 //  -moz-osx-font-smoothing: grayscale;}
 /* 重置样式 */
-body, h1, h2, h3, h4, h5, h6, p, dl, dd, ul, ol, pre, form, input, textarea, th, td, select {
-  margin: 0;
-  padding: 0;
-}
-
-* {
-  font-family: "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", "WenQuanYi Micro Hei", "Microsoft YaHei", Arial, sans-serif;
-  font-size: 12px;
-  line-height: 1.5;
-}
-a:focus ,a:hover,a:visited,a:active{
-  outline:none;
-  -moz-outline:none;
-}
-em {
-  font-style: normal;
-}
-
-ul, li {
-  list-style: none;
-}
-
-a {
-  text-decoration: none;
-  color: #000;
-}
-
-.container, .uk-container {
-  box-sizing: border-box;
-  width: 1200px;
-}
-
-.container-center, .uk-container-center {
-  margin-left: auto;
-  margin-right: auto;
-}
 
 .grid {
   display: -ms-flexbox;
@@ -267,22 +218,6 @@ a {
 .width-9-10 {
   width: 90%;
 }
-.clear:before,.clear:after, .clearfix:before,.clearfix:after{
-  content: '';
-  display: block;
-  overflow: hidden;
-}
-.clear:after,.clearfix:after{
-  clear: both;
-}
-.fr{
-  float: right;
-}
-.fl{
-  float: left;
-}
-img{
-  display: block;
-}
+
 
 
