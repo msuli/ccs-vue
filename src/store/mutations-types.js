@@ -1,0 +1,3 @@
+export const DEFAULT_CAT_ID = 'DEFAULT_CAT_ID';
+export const GET_BOOKLIST = 'GET_BOOKLIST';
+export const INIT_BOOKLIST = 'INIT_BOOKLIST';

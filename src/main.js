@@ -19,7 +19,7 @@ Vue.use(vueScrollTo, {
   x: false,
   y: true
 })
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 import './assets/style/common.scss'
 /* eslint-disable no-new */
 new Vue({

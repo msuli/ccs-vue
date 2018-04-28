@@ -211,7 +211,8 @@
 </template>
 <script>
   import myHeader from '../components/header/header.vue'
-  import {getSliderService, getBookListService, getNewGoodsService, getHotSaleListService} from '../service/getData'
+  import {getSliderService, getBookListService, getNewGoodsService, getHotSaleListService} from '../service/getData';
+  import {mapMutations} from 'vuex';
   export default{
     data () {
       return {
@@ -238,6 +239,7 @@
       myHeader
     },
     methods: {
+      ...mapMutations(['GET_BOOKLIST', 'DEFAULT_CAT_ID']),
       async initData () {
         await this.getNewGoods();
         await this.getBookList();
@@ -259,6 +261,15 @@
         getBookListService(this.$http)
           .then(res => {
             this.bookList = res;
+            let catId;
+            if (this.bookList[0].children.length) {
+              catId = this.bookList[0].children[0].catId;
+            } else {
+              catId = this.bookList
+                [0].catId;
+            }
+            this.DEFAULT_CAT_ID({catId: catId});//存默认的分类id到localstorage
+            this.GET_BOOKLIST(res); //booklist数据存到localstorage
           }, error => {
             console.log(error);
           })

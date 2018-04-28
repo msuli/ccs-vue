@@ -1,69 +1,57 @@
 <template>
   <div class="policy-tab">
     <ul>
-      <li class="books-name" v-for="(bookItem, index) in selectedBookList" :key="index"
-          :class="{'active': index === selectedBookIndex}" @click="clickBooks(index)">
+      <li class="books-name" v-for="(bookItem, index) in CalcBookList" :key="index"
+          :class="{'active': index === selectedBookIndex}" @click="clickBooks(index, true)">
         <!---->
         <a href="javascript:void(0)">{{bookItem.booksName}}</a>
       </li>
     </ul>
 
-    <ul class="policy-cat" v-if="selectedBookList.length">
-      <li class="policy-cat-list" v-for="(catItem, i) in selectedBookList[selectedBookIndex].children"
-          :class="{'active': i === selectedCatIndex}" :key="i" @click="clickCat(i)">
+    <ul class="policy-cat" v-if="CalcBookList.length">
+      <li class="policy-cat-list" v-for="(catItem, i) in CalcBookList[selectedBookIndex].children"
+          :class="{'active': i === selectedCatIndex}" :key="i" @click="clickBooks(i, false)">
         <a href="javascript:void(0)">{{catItem.catName}}</a>
       </li>
     </ul>
   </div>
 </template>
 <script>
-  import {getBookListService} from '../../service/getData';
-  import {mapMutations} from 'vuex';
+  import {mapMutations, mapState} from 'vuex';
+  import {getStore} from "../../config/mUtil";
   export default{
     data(){
       return {
-        selectedBookList: [],
         selectedBookIndex: 0,
         selectedCatIndex: 0
       }
     },
-    methods: {
-      ...mapMutations(['getDefaultCatId']),
-      initData(){
-        getBookListService(this.$http).then((res) => {
-          this.selectedBookList = res;
-          let catId;
-          if (this.selectedBookList[0].children.length) {
-            catId = this.selectedBookList[0].children[0].catId;
-          } else {
-            catId = this.selectedBookList[0].catId;
-          }
-          this.getDefaultCatId({catId: catId});
-        }, error => {
-          console.log(error);
-        })
-      },
-      clickBooks(index){
-        this.selectedBookIndex = index;
-        let catId;
-        if (this.selectedBookList[index].children.length) {
-          catId = this.selectedBookList[index].children[0].catId;
-        } else {
-          catId = this.selectedBookList[index].catId;
-        }
-        this.$emit('getBooksId', catId);
-      },
-      clickCat(i){
-        this.selectedCatIndex = i;
-        let catId = this.selectedBookList[this.selectedBookIndex].children[i].catId;
-        this.$emit('getCatId', catId);
+    computed: {
+      ...mapState(['bookList']),
+      CalcBookList(){
+        return [...this.bookList];
       }
     },
-    computed: {
-
+    methods: {
+      ...mapMutations(['DEFAULT_CAT_ID', 'GET_BOOKLIST', 'INIT_BOOKLIST']),
+      clickBooks(index, f){
+        let catId;
+        if(f){
+          this.selectedBookIndex = index;
+          if (this.CalcBookList[index].children.length) {
+            catId = this.CalcBookList[index].children[0].catId;
+          } else {
+            catId = this.CalcBookList[index].catId;
+          }
+        }else{
+          this.selectedCatIndex = i;
+          catId = this.CalcBookList[this.selectedBookIndex].children[i].catId;
+        }
+        this.$emit('getBooksId', catId);
+      }
     },
-    mounted(){
-      this.initData();
+    created(){
+      this.INIT_BOOKLIST();  //组件创建时从localstorage获取数据存到state中。然后在计算属性中返回数据?
     }
   }
 </script>

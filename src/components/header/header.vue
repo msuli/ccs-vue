@@ -254,7 +254,6 @@
         font-size: $font16;
         padding: 11px 53px;
         background: $mainColor * 0.9;
-        border-bottom: 4px solid $mainColor * 0.9;
       }
       .icon {
         display: inline-block;
@@ -271,7 +270,7 @@
         position: absolute;
         left: 0;
         right: 0;
-        top: 44px;
+        top: 46px;
         padding-left: 2px;
         z-index: 2;
         &.secondCat {

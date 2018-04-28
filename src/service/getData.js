@@ -1,4 +1,4 @@
-export function getSliderService (http) {
+export function getSliderService(http) {
   return http.get('/static/mocks/slider.json')
     .then(res => {
       return res.body.sliderList
@@ -60,7 +60,13 @@ export const getHotSaleListService = http => {
     })
 }
 export const getSpecialPriceService = (http, params) => {
-  return http.get('http://localhost:3006/specialPrice/specialPrice', {params: {'catId': params.catId},})
+  return http.get('http://localhost:3006/specialPrice/specialPrice', {
+    params: {
+      catId: params.catId,
+      pageSize: params.pageSize,
+      pageIndex: params.pageIndex
+    },
+  })
     .then((res) => {
       let data = res.body;
       console.log(2323, data);

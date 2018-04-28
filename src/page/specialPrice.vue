@@ -4,17 +4,20 @@
                :showProgressbar="false"></my-header>
     <div class="sp-wrap">
       <div class="uk-container uk-container-center">
-        <policy-tab @getBooksId="getBooks" @getCatId="getCat"></policy-tab>
+        <policy-tab @getBooksId="getBooks"></policy-tab>
         <div class="policy-content">
           <div class="current-show" id="specialPrice">
-            <ul class="grid grid-small mt-10 grid-width-1-2 exponent-list show" v-for="(list, i) in specialPriceList" :key="i">
+            <div>{{currentCatId}}</div>
+            <ul class="grid grid-small mt-10 grid-width-1-2 exponent-list" v-for="(list, i) in specialPriceList" :key="i" :class="{'show': currentCatId == list.catId}" :id="list.catId">
               <li class="item" v-for="(item, index) in list.spList" :key="index">
                 <div class="list-bg-color panel-box">
                   <div class="grid grid-collapse">
                     <div class="uk-width checkbox">
                       <input
                         type="checkbox"
-                        :id="'exponentCheck'+index"
+                        :id="'exponentCheck'+i+index"
+                        :value="item"
+                        v-model="checkedList"
                       >
                       <label :for="'exponentCheck'+index"></label>
                     </div>
@@ -23,8 +26,7 @@
                         <img class="scrollLoading"
                              src="/static/images/lazy.png" alt="">
                       </a>
-                      <div class="countdown clear-inline-space" :id="item.itemCode+item.policyCode">
-                      </div>
+                      <countdown :startTime="item.policyStartTime" :endTime="item.policyEndTime" :systemTime="item.systemTime" @timerOver="countDownOver"></countdown>
                     </div>
                     <div class="uk-width right">
                       <a href=""
@@ -47,10 +49,10 @@
                           <input
                             type="number"
                             class="number"
-                            value="1"
+                            v-model="item.count"
                           >
-                          <span class="plus">+</span>
-                          <span class="minus" :class="{'not-allowed':item.count <= 1}">-</span>
+                          <span class="plus" @click="plus(item)">+</span>
+                          <span class="minus" :class="{'not-allowed':item.count <= 1}" @click="minus(item)">-</span>
                         </div>
                         <button class="uk-button uk-button-danger uk-button-large subtn quickToBuySp"
                                 type="button"
@@ -64,10 +66,80 @@
             </ul>
           </div>
           <div class="page-wrap">
-            <div class="paginate"></div>
+            <div class="paginate">
+              <pagination :totalPage="10"></pagination>
+            </div>
           </div>
         </div>
-        <div class="pro-cart" id="selectedSp">
+        <div class="pro-cart" id="selectedSp" v-if="getCartList.cartList.length">
+          <div>
+            <div class="total-account" id="totalNumber">
+              <span class="choose">已选择<em>{{ getCartList.totalNumber }}</em>件商品
+              </span>
+              <span>总价：<em class="total-price">¥ {{ getCartList.totalPrice }}</em></span>
+            </div>
+            <div class="select-container">
+              <div class="overflow-hidden">
+                <ul class="grid grid-width-1-4 grid-collapse" v-if="getCartList.cartList.length > 4"
+                    :style="{width: selItem.selList.length * 258 +'px'}"
+                    id="selected-sp">
+                  <li class="width" style="width:  258px" v-for="(item, index) in getCartList.cartList">
+                    <a href="" class="display-block"  target="_blank">
+                      <div class="grid grid-collapse border">
+                        <div class="width" style="width: 90px">
+                          <img src="/static/images/lazy.png" alt="">
+                        </div>
+                        <div class="width" style="width: 120px">
+                          <div style="padding-right: 12px">
+                            <p class="s-product-name" :title="item.itemName">
+                              {{item.itemName}}
+                            </p>
+                            <p class="shopping-price">¥{{item.specialPrice}}</p>
+                          </div>
+                        </div>
+                        <div class="width s-number" style="width: 47px">
+                          <i>x</i>
+                          <span>{{item.count}}</span>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                </ul>
+                <ul class="grid grid-width-1-4 grid-collapse"
+                    id="selected-sp" style="width: 100%" v-else>
+                  <li v-for="(item, index) in getCartList.cartList">
+                    <a href="" class="display-block"  target="_blank">
+                      <div class="grid grid-collapse border">
+                        <div class="width-31" style="width: 76px;">
+                          <img src="/static/images/lazy.png" alt=""
+                               :title="item.itemName">
+                        </div>
+                        <div class="width-51" style="width: 125px">
+                          <div style="padding-right: 12px">
+                            <p class="s-product-name">
+                              {{item.itemName}}
+                            </p>
+                            <p class="shopping-price">¥{{item.samplePrice}}</p>
+                          </div>
+                        </div>
+                        <div class="width-18 s-number" style="width: 44px;">
+                          <i>x</i>
+                          <span>{{item.count}}</span>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <a class="prev hide">
+                <img src="/static/images/left-arrow.png" alt="">
+              </a>
+              <a class="next" v-if="getCartList.cartList.length > 4">
+                <img src="/static/images/right-arrow.png" alt="">
+              </a>
+              <button class="uk-button uk-button-danger buyBtn">购买</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -77,50 +149,102 @@
   import policyTab from '../components/common/policyTab.vue';
   import myHeader from '../components/header/header.vue';
   import {getSpecialPriceService} from '../service/getData';
-
+  import {getStore} from "../config/mUtil";
+  import countdown from '../components/common/countdown.vue';
+  import pagination from '../components/common/pagination.vue';
   export default {
     data(){
       return {
-        showSearch: true,
+        postData: {  //请求接口的参数
+          catId: '',
+          pageSize: 4,
+          pageIndex: 1
+        },
         specialPriceList: [], //特价商品列表
-        currentCatId: '',
-        catId: ''
+        currentCatId: '',  //当前显示的catId
+        checkedList: [],
+        selectedList: [],
       }
     },
     computed: {
-      defaultCatId () {
-        return this.$store.state.defaultCatId;
-      }
+      getCartList(){
+        let cartList = [];
+        this.checkedList.forEach((item) => {
+          if(item.catId == this.currentCatId){
+            cartList.push(item);
+          }
+        });
+        let total = this.calc(cartList)
+        return {
+          totalPrice: total.totalPrice,
+          totalNumber: total.totalNumber,
+          cartList: cartList
+        };
+      },
     },
     components: {
       policyTab,
-      myHeader
+      myHeader,
+      countdown,
+      pagination
     },
     methods: {
-
-      initData(){
-        this.getSpecialPriceData();
+      countDownOver(){
+       console.log('结束');
+       this.initData();
       },
-      getSpecialPriceData(){
-          console.log('this.defaultCatId', this.defaultCatId);
-          let obj = {
-            'catId': this.defaultCatId
+      initData(){
+        let catId;
+        if(!this.currentCatId){
+          catId = getStore('defaultCatId');
+        }else {
+          catId = this.currentCatId;
+        }
+        this.currentCatId = catId;
+        this.postData.catId = catId;
+        getSpecialPriceService(this.$http, this.postData).then((res) => {
+          if(!res.length){
+            return;
           }
-        getSpecialPriceService(this.$http, obj).then((res) => {
-          console.log('res', res);
-          let catId = res[0].catId
-          this.specialPriceList.push({spList: res, catId: catId});
+          res.forEach((item) => {
+            item.count = 1; //接口拿回来的数据的默认数量设置为1
+          });
+          this.specialPriceList.push({catId: catId, spList: res});
         }, (error) => {
           console.log(error);
         })
       },
       getBooks(bookId){
-        this.catId = bookId;
-        console.log('booksId', bookId);
+          let f = false;
+        this.currentCatId = bookId;
+        this.specialPriceList.forEach((item)=> {
+          if(item.catId == bookId){
+           f = true;
+          }
+        })
+        if(!f){
+          this.initData();
+        }
       },
-      getCat(catId){
-        this.catId = catId;
-        console.log('catId', catId);
+      //计算加购物车的总数量和总价格
+      calc(arr){
+        let totalPrice = 0;
+        let totalNumber = 0;
+        arr.forEach(s => {
+          totalNumber += s.count;
+          totalPrice += s.count * s.samplePrice;
+        })
+        return {
+          totalPrice: totalPrice,
+          totalNumber: totalNumber
+        }
+      },
+      plus(item){
+        item.count++;
+      },
+      minus(item){
+        let value = item.count;
+        item.count = value > 1 ? value-1 : 1;
       }
     },
     mounted(){
@@ -320,7 +444,7 @@
     width: 20px;
     line-height: 245px;
     input {
-      display: none;
+      opacity: 0;
       position: absolute;
       top: 50%;
       margin-top: -7px;
@@ -542,7 +666,7 @@
             height: 100%;
           }
           img {
-            height: 75px;
+            height: 60px;
             margin: 0 auto;
           }
           .s-product-name {
@@ -569,6 +693,7 @@
               display: inline-block;
               color: #333333;
               letter-spacing: 0;
+              font-style: normal;
             }
             & > span {
               padding-left: 3px;
